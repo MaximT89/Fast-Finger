@@ -2,13 +2,10 @@ package com.boxma.gamer.fastfinger.presentation.views.gameScreen
 
 import android.annotation.SuppressLint
 import android.os.Bundle
-import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.viewModels
-import androidx.navigation.fragment.findNavController
-import com.boxma.gamer.fastfinger.R
 import com.boxma.gamer.fastfinger.core.BaseFragment
 import com.boxma.gamer.fastfinger.databinding.FragmentGameBinding
 import com.boxma.gamer.fastfinger.utils.DisplayMetrics
@@ -29,11 +26,33 @@ class GameFragment : BaseFragment<FragmentGameBinding>() {
     }
 
     private fun initObservers() {
+        with(viewModel){
+
+            currentSecondGame.observe(this@GameFragment, {
+                binding.testText.text = it.toString()
+            })
+
+            isEndLevel.observe(this@GameFragment, {
+                if (it){
+                    binding.testText.text = "Game Over!"
+                }
+            })
+
+
+        }
     }
 
     private fun initUI() {
-        binding.testText.text = "displaySize: ${DisplayMetrics.displayWidth(requireActivity())} and ${DisplayMetrics.displayHeight(requireActivity())}"
+        with(binding){
+            testText.text = "displaySize: ${DisplayMetrics.displayWidth(requireActivity())} and ${DisplayMetrics.displayHeight(requireActivity())}"
+
+            startGame.setOnClickListener {
+                viewModel.startGame()
+            }
+
+            pauseGame.setOnClickListener {
+                viewModel.pauseGame()
+            }
+        }
     }
-
-
 }
