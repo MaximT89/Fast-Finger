@@ -1,22 +1,27 @@
 package com.boxma.gamer.fastfinger.presentation.views.gameScreen
 
 import android.os.CountDownTimer
-import android.util.Log
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 
 class GameFragmentViewModel : ViewModel() {
 
     val TAG = "TAG"
-    private lateinit var timer : CountDownTimer
+    private lateinit var gameTimer: CountDownTimer
+    private lateinit var createItemsTimer: CountDownTimer
 
     val isGame = MutableLiveData(false)
     val isEndLevel = MutableLiveData(false)
     val currentSecondGame = MutableLiveData(0L)
-    var gameTime = 10000L
+    val itemCount = MutableLiveData(0L)
+    var gameTime = 20000L
 
-    private fun startTimer(time : Long){
-        timer = object : CountDownTimer(time, 1000) {
+
+    private fun startGameTimer(time: Long) {
+        gameTimer = object : CountDownTimer(time, 1000) {
             override fun onTick(p0: Long) {
                 currentSecondGame.postValue(p0 / 1000)
             }
@@ -24,26 +29,31 @@ class GameFragmentViewModel : ViewModel() {
             override fun onFinish() {
                 isGame.postValue(false)
                 isEndLevel.postValue(true)
-                gameTime = 10000L
             }
         }.start()
     }
 
-    fun restTimer() {
-        gameTime = 10000L
-        isGame.postValue(false)
+    private fun startItemsTimer(time: Long, speed: Long){
+        createItemsTimer = object : CountDownTimer(time, speed){
+            override fun onTick(p0: Long) {
+                itemCount.postValue(p0 / speed)
+            }
+
+            override fun onFinish() {
+                itemCount.postValue(0)
+            }
+        }.start()
     }
 
     fun startGame() {
         isGame.postValue(true)
         isEndLevel.postValue(false)
-        startTimer(gameTime)
+        startGameTimer(gameTime)
+        startItemsTimer(gameTime, speedCreateItems())
     }
 
-    fun pauseGame() {
-        timer.cancel()
-        gameTime = currentSecondGame.value!! * 1000
-        Log.d(TAG, "pauseGame: currentSecondGame ${currentSecondGame.value} and gameTime $gameTime")
+    private fun speedCreateItems(): Long {
+        // TODO: тут нужно сделать логику увеличения скорости от уровня сложности
+        return 800L
     }
-
 }

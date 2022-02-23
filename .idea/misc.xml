@@ -3,6 +3,9 @@
   <component name="DesignSurface">
     <option name="filePathToZoomLevelMap">
       <map>
+        <entry key="..\:/Users/Maksik/AndroidStudioProjects/Fast-Finger/app/src/main/res/drawable/text_stroke.xml" value="0.301" />
+        <entry key="..\:/Users/Maksik/AndroidStudioProjects/Fast-Finger/app/src/main/res/layout/activity_game.xml" value="0.27564102564102566" />
+        <entry key="..\:/Users/Maksik/AndroidStudioProjects/Fast-Finger/app/src/main/res/layout/fragment_game.xml" value="0.33" />
         <entry key="..\:/Users/Max/AndroidStudioProjects/FastFinger/app/src/main/res/layout/activity_main.xml" value="0.503125" />
         <entry key="..\:/Users/Max/AndroidStudioProjects/FastFinger/app/src/main/res/layout/fragment_game.xml" value="0.5213541666666667" />
       </map>
