@@ -4,10 +4,13 @@ import android.os.CountDownTimer
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
-class GameFragmentViewModel : ViewModel() {
+@HiltViewModel
+class GameFragmentViewModel @Inject constructor() : ViewModel() {
 
     val TAG = "TAG"
     private lateinit var gameTimer: CountDownTimer
@@ -17,6 +20,7 @@ class GameFragmentViewModel : ViewModel() {
     val isEndLevel = MutableLiveData(false)
     val currentSecondGame = MutableLiveData(0L)
     val itemCount = MutableLiveData(0L)
+    val lifes = MutableLiveData(3)
     var gameTime = 20000L
 
 
@@ -33,8 +37,8 @@ class GameFragmentViewModel : ViewModel() {
         }.start()
     }
 
-    private fun startItemsTimer(time: Long, speed: Long){
-        createItemsTimer = object : CountDownTimer(time, speed){
+    private fun startItemsTimer(time: Long, speed: Long) {
+        createItemsTimer = object : CountDownTimer(time, speed) {
             override fun onTick(p0: Long) {
                 itemCount.postValue(p0 / speed)
             }
@@ -43,6 +47,14 @@ class GameFragmentViewModel : ViewModel() {
                 itemCount.postValue(0)
             }
         }.start()
+    }
+
+    fun minusLife() {
+        lifes.postValue(lifes.value?.minus(1))
+    }
+
+    fun plusLife() {
+        lifes.postValue(lifes.value?.plus(1))
     }
 
     fun startGame() {
