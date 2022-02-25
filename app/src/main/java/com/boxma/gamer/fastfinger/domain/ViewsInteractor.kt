@@ -23,8 +23,8 @@ class ViewsInteractor @Inject constructor(private val repository: Repository) {
 
     var callBackRemoveHeart: (() -> Unit)? = null
 
-    private var widthItem = 200
-    private var heightItem = 200
+    private var widthItem = R.dimen.widthItem
+    private var heightItem = R.dimen.heightItem
     private var speedItem = 4000L
 
     fun createItem(activity: Activity, parentView: RelativeLayout, textScore: TextView) {
@@ -72,7 +72,7 @@ class ViewsInteractor @Inject constructor(private val repository: Repository) {
 
         imageView.setOnClickListener {
             parentView.removeView(imageView)
-            repository.updateScore(10)
+            repository.updateScore(10) // TODO: 25.02.2022 сделать класс где будет описана логика прироста очков
             updateTextScore(textScore)
             animatorSet.cancel()
         }

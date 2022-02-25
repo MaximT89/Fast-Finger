@@ -28,25 +28,46 @@
 
     <LinearLayout
         android:id="@+id/field_life"
-        android:layout_width="110dp"
+        android:layout_width="180dp"
         android:layout_height="30dp"
+        android:layout_marginRight="5dp"
         android:translationZ="100dp"
         android:layout_gravity="right"
+        android:gravity="right"
         android:layout_marginTop="25dp"
         android:orientation="horizontal">
 
         <ImageView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:visibility="gone"
+            tools:visibility="visible"
             android:src="@drawable/heart_2"/>
         <ImageView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:visibility="gone"
+            tools:visibility="visible"
             android:src="@drawable/heart_2"/>
         <ImageView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:visibility="gone"
+            tools:visibility="visible"
             android:src="@drawable/heart_2"/>
+        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:visibility="gone"
+            tools:visibility="visible"
+            android:src="@drawable/heart_2"/>
+        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:visibility="gone"
+            tools:visibility="visible"
+            android:src="@drawable/heart_2"/>
+
 
     </LinearLayout>
 

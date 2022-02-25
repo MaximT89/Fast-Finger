@@ -1,5 +1,7 @@
 <resources>
     <string name="app_name">Fast Finger</string>
-    <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
+
+    <dimen name="widthItem">200</dimen>
+    <dimen name="heightItem">200</dimen>
 </resources>
