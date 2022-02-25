@@ -18,7 +18,7 @@ import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 
 @AndroidEntryPoint
-class GameFragment : BaseFragment<FragmentGameBinding>() {
+class GameFragment : BaseFragment<FragmentGameBinding>()  {
 
     private val viewModel: GameFragmentViewModel by viewModels()
 
@@ -72,6 +72,7 @@ class GameFragment : BaseFragment<FragmentGameBinding>() {
     private fun initUI() {
 
         viewsInteractor.updateTextScore(binding.textScore)
+        viewsInteractor.callBackRemoveHeart = { removeHeart() }
 
         with(binding) {
 
@@ -87,11 +88,16 @@ class GameFragment : BaseFragment<FragmentGameBinding>() {
             }
 
             btnDeleteHeart.setOnClickListener {
-
-                view?.findViewById<ImageView>(viewsInteractor.getIdHeart())?.let {
-                    viewsInteractor.removeHeart(fieldLife, it)
-                }
+                removeHeart()
             }
         }
     }
+
+    private fun removeHeart(){
+        view?.findViewById<ImageView>(viewsInteractor.getIdHeart())?.let {
+            viewsInteractor.removeHeart(binding.fieldLife, it)
+        }
+    }
+
+
 }

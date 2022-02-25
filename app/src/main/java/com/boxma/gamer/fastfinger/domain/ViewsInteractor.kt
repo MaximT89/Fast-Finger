@@ -17,16 +17,20 @@ import com.boxma.gamer.fastfinger.data.Repository
 import com.boxma.gamer.fastfinger.utils.DisplayMetrics
 import javax.inject.Inject
 
+
 @SuppressLint("SetTextI18n")
 class ViewsInteractor @Inject constructor(private val repository: Repository) {
+
+    var callBackRemoveHeart: (() -> Unit)? = null
 
     private var widthItem = 200
     private var heightItem = 200
     private var speedItem = 4000L
 
-    fun createItem(activity: Activity, parentView : RelativeLayout, textScore: TextView) {
+    fun createItem(activity: Activity, parentView: RelativeLayout, textScore: TextView) {
 
-        fun randomMarginStart() : Int = (8..(DisplayMetrics.displayWidth(activity) - widthItem)).random()
+        fun randomMarginStart(): Int =
+            (8..(DisplayMetrics.displayWidth(activity) - widthItem)).random()
 
         val params = LinearLayout.LayoutParams(widthItem, heightItem).apply {
             marginStart = randomMarginStart()
@@ -40,8 +44,11 @@ class ViewsInteractor @Inject constructor(private val repository: Repository) {
 
         parentView.addView(imageView)
 
-        val translateYAnimation : ObjectAnimator = ObjectAnimator.ofFloat(
-            imageView, "translationY", 0f, (DisplayMetrics.displayHeight(activity) - heightItem).toFloat()
+        val translateYAnimation: ObjectAnimator = ObjectAnimator.ofFloat(
+            imageView,
+            "translationY",
+            0f,
+            (DisplayMetrics.displayHeight(activity) - heightItem).toFloat()
         ).apply {
             repeatCount = 0
         }
@@ -53,10 +60,13 @@ class ViewsInteractor @Inject constructor(private val repository: Repository) {
             start()
         }
 
-        animatorSet.addListener(object : AnimatorListenerAdapter(){
+        animatorSet.addListener(object : AnimatorListenerAdapter() {
+
             override fun onAnimationEnd(animation: Animator?) {
                 super.onAnimationEnd(animation)
                 parentView.removeView(imageView)
+
+                callBackRemoveHeart?.invoke()
             }
         })
 
@@ -68,16 +78,18 @@ class ViewsInteractor @Inject constructor(private val repository: Repository) {
         }
     }
 
-    fun updateTextScore(textScore: TextView){
+    fun updateTextScore(textScore: TextView) {
         textScore.text = "Score : ${repository.getScore()}"
     }
 
     @SuppressLint("ResourceType")
-    fun createLifes(activity: Activity, layout : LinearLayout){
+    fun createLifes(activity: Activity, layout: LinearLayout) {
 
-        for (i in 1..repository.getCurrentLife()){
-            val params = LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT,
-                LinearLayout.LayoutParams.WRAP_CONTENT)
+        for (i in 1..repository.getCurrentLife()) {
+            val params = LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.WRAP_CONTENT,
+                LinearLayout.LayoutParams.WRAP_CONTENT
+            )
 
             val imageView = ImageView(activity).apply {
                 setImageResource(R.drawable.heart_2)
@@ -92,13 +104,30 @@ class ViewsInteractor @Inject constructor(private val repository: Repository) {
 
     fun getIdHeart() = 100 + repository.getCurrentLife()
 
-    fun removeAllHeart(layout: LinearLayout){
+    fun removeAllHeart(layout: LinearLayout) {
         layout.removeAllViews()
     }
 
-    fun removeHeart(layout: LinearLayout, view: View){
+    fun removeHeart(layout: LinearLayout, view: View) {
         layout.removeView(view)
         repository.minusCurrentLife(1)
+    }
+
+    fun addHeart(activity: Activity, layout: LinearLayout) {
+
+        val params = LinearLayout.LayoutParams(
+            LinearLayout.LayoutParams.WRAP_CONTENT,
+            LinearLayout.LayoutParams.WRAP_CONTENT
+        )
+
+        val imageView = ImageView(activity).apply {
+            setImageResource(R.drawable.heart_2)
+            layoutParams = params
+            id = 100 + repository.getCurrentLife() + 1
+            alpha = 1f
+        }
+
+        layout.addView(imageView)
     }
 
 

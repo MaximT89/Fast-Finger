@@ -9,5 +9,4 @@ class LifesInteractor @Inject constructor(private val repository: Repository) {
     fun refreshCurrentLife() = repository.refreshCurrentLife()
     fun minusCurrentLife(value : Int) = repository.minusCurrentLife(value)
     fun plusCurrentLife(value : Int) = repository.plusCurrentLife(value)
-
 }
