@@ -72,7 +72,7 @@ class ViewsInteractor @Inject constructor(private val repository: Repository) {
 
         imageView.setOnClickListener {
             parentView.removeView(imageView)
-            repository.updateScore(10) // TODO: 25.02.2022 сделать класс где будет описана логика прироста очков
+            repository.updateScore(scorePerItem())
             updateTextScore(textScore)
             animatorSet.cancel()
         }
@@ -81,6 +81,9 @@ class ViewsInteractor @Inject constructor(private val repository: Repository) {
     fun updateTextScore(textScore: TextView) {
         textScore.text = "Score : ${repository.getScore()}"
     }
+
+    // TODO: 25.02.2022 сделать класс где будет описана логика прироста очков
+    private fun scorePerItem() : Int = 10
 
     @SuppressLint("ResourceType")
     fun createLifes(activity: Activity, layout: LinearLayout) {

@@ -1,6 +1,5 @@
 package com.boxma.gamer.fastfinger.presentation.views.gameScreen
 
-import android.annotation.SuppressLint
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -68,7 +67,6 @@ class GameFragment : BaseFragment<FragmentGameBinding>()  {
         }
     }
 
-    @SuppressLint("ResourceType")
     private fun initUI() {
 
         viewsInteractor.updateTextScore(binding.textScore)
