@@ -2,6 +2,7 @@ package com.boxma.gamer.fastfinger.di
 
 import android.content.Context
 import com.boxma.gamer.fastfinger.data.Repository
+import com.boxma.gamer.fastfinger.domain.LifesInteractor
 import com.boxma.gamer.fastfinger.domain.ViewsInteractor
 import dagger.Module
 import dagger.Provides
@@ -21,5 +22,9 @@ class Module {
     @Singleton
     @Provides
     fun provideViewsInteractor(repository: Repository) = ViewsInteractor(repository)
+
+    @Singleton
+    @Provides
+    fun provideLifesInteractor(repository: Repository) = LifesInteractor(repository)
 
 }

@@ -1,15 +1,18 @@
 package com.boxma.gamer.fastfinger.presentation.views.gameScreen
 
+import android.annotation.SuppressLint
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.View.GONE
 import android.view.View.VISIBLE
 import android.view.ViewGroup
+import android.widget.ImageView
 import androidx.fragment.app.viewModels
 import com.boxma.gamer.fastfinger.core.BaseFragment
 import com.boxma.gamer.fastfinger.data.Repository
 import com.boxma.gamer.fastfinger.databinding.FragmentGameBinding
+import com.boxma.gamer.fastfinger.domain.LifesInteractor
 import com.boxma.gamer.fastfinger.domain.ViewsInteractor
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
@@ -21,6 +24,7 @@ class GameFragment : BaseFragment<FragmentGameBinding>() {
 
     @Inject lateinit var repository: Repository
     @Inject lateinit var viewsInteractor: ViewsInteractor
+    @Inject lateinit var lifesInteractor: LifesInteractor
 
     override fun initBinding(inflater: LayoutInflater, container: ViewGroup?) =
         FragmentGameBinding.inflate(inflater, container, false)
@@ -64,16 +68,29 @@ class GameFragment : BaseFragment<FragmentGameBinding>() {
         }
     }
 
+    @SuppressLint("ResourceType")
     private fun initUI() {
 
-        viewsInteractor.updateScore(binding.textScore)
+        viewsInteractor.updateTextScore(binding.textScore)
 
         with(binding) {
 
             startGame.setOnClickListener {
+
+                lifesInteractor.refreshCurrentLife()
+                viewsInteractor.removeAllHeart(fieldLife)
+                viewsInteractor.createLifes(requireActivity(), fieldLife)
+
                 viewModel.startGame()
                 repository.removeScore()
-                viewsInteractor.updateScore(binding.textScore)
+                viewsInteractor.updateTextScore(textScore)
+            }
+
+            btnDeleteHeart.setOnClickListener {
+
+                view?.findViewById<ImageView>(viewsInteractor.getIdHeart())?.let {
+                    viewsInteractor.removeHeart(fieldLife, it)
+                }
             }
         }
     }

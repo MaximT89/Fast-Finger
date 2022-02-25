@@ -5,10 +5,20 @@ import com.boxma.gamer.fastfinger.core.BaseSharedPreferences
 
 object StoragePrefs : BaseSharedPreferences {
 
-    private const val PROFILE_SCORE = "profile_score"
+    private const val SCORE = "score"
+    private const val MAX_LIFE = "max_life"
+    private const val CURRENT_LIFE = "current_life"
 
     var SharedPreferences.score
-        get() = getInt(PROFILE_SCORE, 0)
-        set(value) = editMe { it.put(PROFILE_SCORE to value) }
+        get() = getInt(SCORE, 0)
+        set(value) = editMe { it.put(SCORE to value) }
+
+    var SharedPreferences.maxLife
+        get() = getInt(MAX_LIFE, 3)
+        set(value) = editMe { it.put(MAX_LIFE to value) }
+
+    var SharedPreferences.currentLife
+        get() = getInt(CURRENT_LIFE, 0)
+        set(value) = editMe { it.put(CURRENT_LIFE to value) }
 
 }

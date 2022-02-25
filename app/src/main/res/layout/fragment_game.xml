@@ -8,6 +8,13 @@
     android:background="@drawable/bg_ver_3"
     tools:context=".presentation.views.gameScreen.GameFragment">
 
+    <Button
+        android:id="@+id/btn_delete_heart"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom|center_horizontal"
+        android:text="delete heart"/>
+
     <TextView
         android:id="@+id/text_score"
         android:layout_width="wrap_content"

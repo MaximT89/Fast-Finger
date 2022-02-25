@@ -6,6 +6,7 @@ import android.animation.AnimatorSet
 import android.animation.ObjectAnimator
 import android.annotation.SuppressLint
 import android.app.Activity
+import android.view.View
 import android.view.animation.LinearInterpolator
 import android.widget.ImageView
 import android.widget.LinearLayout
@@ -62,12 +63,43 @@ class ViewsInteractor @Inject constructor(private val repository: Repository) {
         imageView.setOnClickListener {
             parentView.removeView(imageView)
             repository.updateScore(10)
-            updateScore(textScore)
+            updateTextScore(textScore)
             animatorSet.cancel()
         }
     }
 
-    fun updateScore(textScore: TextView){
+    fun updateTextScore(textScore: TextView){
         textScore.text = "Score : ${repository.getScore()}"
     }
+
+    @SuppressLint("ResourceType")
+    fun createLifes(activity: Activity, layout : LinearLayout){
+
+        for (i in 1..repository.getCurrentLife()){
+            val params = LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT,
+                LinearLayout.LayoutParams.WRAP_CONTENT)
+
+            val imageView = ImageView(activity).apply {
+                setImageResource(R.drawable.heart_2)
+                layoutParams = params
+                id = 100 + i
+                alpha = 1f
+            }
+
+            layout.addView(imageView)
+        }
+    }
+
+    fun getIdHeart() = 100 + repository.getCurrentLife()
+
+    fun removeAllHeart(layout: LinearLayout){
+        layout.removeAllViews()
+    }
+
+    fun removeHeart(layout: LinearLayout, view: View){
+        layout.removeView(view)
+        repository.minusCurrentLife(1)
+    }
+
+
 }
