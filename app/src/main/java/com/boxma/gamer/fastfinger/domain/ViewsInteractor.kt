@@ -17,14 +17,13 @@ import com.boxma.gamer.fastfinger.data.Repository
 import com.boxma.gamer.fastfinger.utils.DisplayMetrics
 import javax.inject.Inject
 
-
 @SuppressLint("SetTextI18n")
 class ViewsInteractor @Inject constructor(private val repository: Repository) {
 
     var callBackRemoveHeart: (() -> Unit)? = null
 
-    private var widthItem = R.dimen.widthItem
-    private var heightItem = R.dimen.heightItem
+    private var widthItem = 200
+    private var heightItem = 200
     private var speedItem = 4000L
 
     fun createItem(activity: Activity, parentView: RelativeLayout, textScore: TextView) {

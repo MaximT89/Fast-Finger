@@ -1,6 +1,7 @@
 package com.boxma.gamer.fastfinger.presentation.views.gameScreen
 
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.View.GONE
@@ -13,6 +14,8 @@ import com.boxma.gamer.fastfinger.data.Repository
 import com.boxma.gamer.fastfinger.databinding.FragmentGameBinding
 import com.boxma.gamer.fastfinger.domain.LifesInteractor
 import com.boxma.gamer.fastfinger.domain.ViewsInteractor
+import com.boxma.gamer.fastfinger.presentation.views.GameActivity
+import com.boxma.gamer.fastfinger.utils.DisplayMetrics
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 
@@ -34,6 +37,8 @@ class GameFragment : BaseFragment<FragmentGameBinding>()  {
         initUI()
         initObservers()
     }
+
+
 
     private fun initObservers() {
         with(viewModel) {
@@ -68,6 +73,8 @@ class GameFragment : BaseFragment<FragmentGameBinding>()  {
     }
 
     private fun initUI() {
+
+        Log.d("TAG", "initUI: ${DisplayMetrics.displayWidth(requireActivity())}")
 
         viewsInteractor.updateTextScore(binding.textScore)
         viewsInteractor.callBackRemoveHeart = { removeHeart() }
