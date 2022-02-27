@@ -6,6 +6,8 @@ import android.animation.AnimatorSet
 import android.animation.ObjectAnimator
 import android.annotation.SuppressLint
 import android.app.Activity
+import android.content.Context
+import android.media.MediaPlayer
 import android.view.View
 import android.view.animation.LinearInterpolator
 import android.widget.ImageView
@@ -28,22 +30,29 @@ class ViewsInteractor @Inject constructor(private val repository: Repository) {
 
     fun createItem(activity: Activity, parentView: RelativeLayout, textScore: TextView) {
 
-        fun randomMarginStart(): Int =
-            (8..(DisplayMetrics.displayWidth(activity) - widthItem)).random()
+        fun randomMarginStart() = (8..(DisplayMetrics.displayWidth(activity) - widthItem)).random()
 
-        val params = LinearLayout.LayoutParams(widthItem, heightItem).apply {
-            marginStart = randomMarginStart()
+        when (generateItem()) {
+            1 -> createFruit(activity, parentView, textScore, randomMarginStart())
+//            2 -> createBomb(activity: Activity, parentView: RelativeLayout, textScore: TextView)
+            else -> createFruit(activity, parentView, textScore, randomMarginStart())
         }
 
-        val imageView = ImageView(activity).apply {
-            setImageResource(R.drawable.item_2)
-            layoutParams = params
-            alpha = 1f
-        }
+
+    }
+
+    private fun createFruit(
+        activity: Activity,
+        parentView: RelativeLayout,
+        textScore: TextView,
+        randomMarginStart: Int,
+    ) {
+        val imageView = createImageView(activity, R.drawable.item_2, randomMarginStart)
 
         parentView.addView(imageView)
 
-        val translateYAnimation: ObjectAnimator = ObjectAnimator.ofFloat(
+
+        val translateYAnimation = ObjectAnimator.ofFloat(
             imageView,
             "translationY",
             0f,
@@ -71,18 +80,40 @@ class ViewsInteractor @Inject constructor(private val repository: Repository) {
 
         imageView.setOnClickListener {
             parentView.removeView(imageView)
+            itemSound(activity)
             repository.updateScore(scorePerItem())
             updateTextScore(textScore)
             animatorSet.cancel()
         }
     }
 
+    private fun createImageView(activity: Activity, pictureSource: Int, randomMarginStart: Int) =
+        ImageView(activity).apply {
+            setImageResource(pictureSource)
+            layoutParams = getLayoutParam(randomMarginStart)
+            alpha = 1f
+        }
+
+
+    private fun generateItem() = when ((1..100).random()) {
+        in 1..80 -> 1
+        in 81..100 -> 2
+        else -> 1
+    }
+
+
     fun updateTextScore(textScore: TextView) {
         textScore.text = "Score : ${repository.getScore()}"
     }
 
+    private fun itemSound(context: Context) {
+        val mp: MediaPlayer = MediaPlayer.create(context, R.raw.get_item)
+        mp.start()
+        mp.setOnCompletionListener(MediaPlayer::release)
+    }
+
     // TODO: 25.02.2022 сделать класс где будет описана логика прироста очков
-    private fun scorePerItem() : Int = 10
+    private fun scorePerItem(): Int = 10
 
     @SuppressLint("ResourceType")
     fun createLifes(activity: Activity, layout: LinearLayout) {
@@ -110,6 +141,12 @@ class ViewsInteractor @Inject constructor(private val repository: Repository) {
         layout.removeAllViews()
     }
 
+    private fun getLayoutParam(randomMarginStart: Int) =
+        LinearLayout.LayoutParams(widthItem, heightItem).apply {
+            marginStart = randomMarginStart
+        }
+
+
     fun removeHeart(layout: LinearLayout, view: View) {
         layout.removeView(view)
         repository.minusCurrentLife(1)
@@ -131,6 +168,4 @@ class ViewsInteractor @Inject constructor(private val repository: Repository) {
 
         layout.addView(imageView)
     }
-
-
 }
