@@ -14,7 +14,6 @@ import com.boxma.gamer.fastfinger.data.Repository
 import com.boxma.gamer.fastfinger.databinding.FragmentGameBinding
 import com.boxma.gamer.fastfinger.domain.LifesInteractor
 import com.boxma.gamer.fastfinger.domain.ViewsInteractor
-import com.boxma.gamer.fastfinger.presentation.views.GameActivity
 import com.boxma.gamer.fastfinger.utils.DisplayMetrics
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
@@ -38,8 +37,6 @@ class GameFragment : BaseFragment<FragmentGameBinding>()  {
         initObservers()
     }
 
-
-
     private fun initObservers() {
         with(viewModel) {
 
@@ -60,16 +57,21 @@ class GameFragment : BaseFragment<FragmentGameBinding>()  {
             }
 
             isGame.observe(viewLifecycleOwner) {
-                if (it) {
-                    binding.startGame.visibility = GONE
-                    binding.textTimer.visibility = VISIBLE
-                } else {
-                    binding.startGame.visibility = VISIBLE
-                    binding.textTimer.visibility = GONE
-                    binding.gameField.removeAllViews()
-                }
+                if (it) uiStartGame()
+                else uiFinishGame()
             }
         }
+    }
+
+    private fun uiFinishGame() {
+        binding.startGame.visibility = VISIBLE
+        binding.textTimer.visibility = GONE
+        binding.gameField.removeAllViews()
+    }
+
+    private fun uiStartGame() {
+        binding.startGame.visibility = GONE
+        binding.textTimer.visibility = VISIBLE
     }
 
     private fun initUI() {
@@ -93,7 +95,11 @@ class GameFragment : BaseFragment<FragmentGameBinding>()  {
             }
 
             btnDeleteHeart.setOnClickListener {
-                removeHeart()
+
+                viewsInteractor.showDialog(requireActivity())
+
+                viewModel.stopGame()
+                uiFinishGame()
             }
         }
     }
@@ -102,6 +108,7 @@ class GameFragment : BaseFragment<FragmentGameBinding>()  {
         view?.findViewById<ImageView>(viewsInteractor.getIdHeart())?.let {
             viewsInteractor.removeHeart(binding.fieldLife, it)
         }
+
     }
 
 

@@ -21,7 +21,8 @@ class GameFragmentViewModel @Inject constructor() : ViewModel() {
     val currentSecondGame = MutableLiveData(0L)
     val itemCount = MutableLiveData(0L)
     val lifes = MutableLiveData(3)
-    var gameTime = 20000L
+//    var gameTime = 20000L
+    var gameTime = 4000L
 
 
     private fun startGameTimer(time: Long) {
@@ -64,8 +65,15 @@ class GameFragmentViewModel @Inject constructor() : ViewModel() {
         startItemsTimer(gameTime, speedCreateItems())
     }
 
+    fun stopGame(){
+        isGame.postValue(false)
+        gameTimer.cancel()
+        createItemsTimer.cancel()
+    }
+
     private fun speedCreateItems(): Long {
         // TODO: тут нужно сделать логику увеличения скорости от уровня сложности
         return 800L
     }
+
 }

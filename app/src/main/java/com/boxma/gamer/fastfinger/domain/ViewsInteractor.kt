@@ -6,14 +6,13 @@ import android.animation.AnimatorSet
 import android.animation.ObjectAnimator
 import android.annotation.SuppressLint
 import android.app.Activity
+import android.app.Dialog
 import android.content.Context
 import android.media.MediaPlayer
 import android.view.View
+import android.view.Window
 import android.view.animation.LinearInterpolator
-import android.widget.ImageView
-import android.widget.LinearLayout
-import android.widget.RelativeLayout
-import android.widget.TextView
+import android.widget.*
 import com.boxma.gamer.fastfinger.R
 import com.boxma.gamer.fastfinger.data.Repository
 import com.boxma.gamer.fastfinger.utils.DisplayMetrics
@@ -37,8 +36,6 @@ class ViewsInteractor @Inject constructor(private val repository: Repository) {
 //            2 -> createBomb(activity: Activity, parentView: RelativeLayout, textScore: TextView)
             else -> createFruit(activity, parentView, textScore, randomMarginStart())
         }
-
-
     }
 
     private fun createFruit(
@@ -47,11 +44,37 @@ class ViewsInteractor @Inject constructor(private val repository: Repository) {
         textScore: TextView,
         randomMarginStart: Int,
     ) {
-        val imageView = createImageView(activity, R.drawable.item_2, randomMarginStart)
 
-        parentView.addView(imageView)
+        val imageView = createImageView(activity, R.drawable.item_2, randomMarginStart).also {
+            parentView.addView(it)
+        }
 
+        val animatorSet = createAnimatorSet(activity, heightItem, speedItem, imageView).apply {
+            addListener(object : AnimatorListenerAdapter() {
 
+                override fun onAnimationEnd(animation: Animator?) {
+                    super.onAnimationEnd(animation)
+                    parentView.removeView(imageView)
+                }
+            })
+        }
+
+        imageView.setOnClickListener {
+            parentView.removeView(imageView)
+            itemSound(activity)
+            repository.updateScore(scorePerItem())
+            updateTextScore(textScore)
+            animatorSet.cancel()
+            callBackRemoveHeart?.invoke()
+        }
+    }
+
+    private fun createAnimatorSet(
+        activity: Activity,
+        heightItem: Int,
+        speedItem: Long,
+        imageView: ImageView
+    ): AnimatorSet {
         val translateYAnimation = ObjectAnimator.ofFloat(
             imageView,
             "translationY",
@@ -61,29 +84,11 @@ class ViewsInteractor @Inject constructor(private val repository: Repository) {
             repeatCount = 0
         }
 
-        val animatorSet = AnimatorSet().apply {
+        return AnimatorSet().apply {
             duration = speedItem
             playTogether(translateYAnimation)
             interpolator = LinearInterpolator()
             start()
-        }
-
-        animatorSet.addListener(object : AnimatorListenerAdapter() {
-
-            override fun onAnimationEnd(animation: Animator?) {
-                super.onAnimationEnd(animation)
-                parentView.removeView(imageView)
-
-                callBackRemoveHeart?.invoke()
-            }
-        })
-
-        imageView.setOnClickListener {
-            parentView.removeView(imageView)
-            itemSound(activity)
-            repository.updateScore(scorePerItem())
-            updateTextScore(textScore)
-            animatorSet.cancel()
         }
     }
 
@@ -94,13 +99,11 @@ class ViewsInteractor @Inject constructor(private val repository: Repository) {
             alpha = 1f
         }
 
-
     private fun generateItem() = when ((1..100).random()) {
         in 1..80 -> 1
         in 81..100 -> 2
         else -> 1
     }
-
 
     fun updateTextScore(textScore: TextView) {
         textScore.text = "Score : ${repository.getScore()}"
@@ -167,5 +170,21 @@ class ViewsInteractor @Inject constructor(private val repository: Repository) {
         }
 
         layout.addView(imageView)
+    }
+
+    fun showDialog(activity: Activity){
+
+        val dialog = Dialog(activity, R.style.CustomDialog).apply {
+            requestWindowFeature(Window.FEATURE_NO_TITLE)
+            setCancelable(false)
+            setContentView(R.layout.fragment_custom)
+            show()
+        }
+        val body = dialog.findViewById(R.id.btn_start_game) as Button
+        body.text = "Start game"
+        val yesBtn = dialog.findViewById<Button>(R.id.btn_yes)
+        val noBtn = dialog.findViewById(R.id.btn_no) as Button
+        yesBtn.setOnClickListener { dialog.dismiss() }
+        noBtn.setOnClickListener { dialog.dismiss() }
     }
 }
