@@ -17,14 +17,18 @@ import com.boxma.gamer.fastfinger.R
 import com.boxma.gamer.fastfinger.data.Repository
 import javax.inject.Inject
 
-@SuppressLint("SetTextI18n")
+enum class ItemsType {
+    BOMB,
+    FRUIT
+}
+
+@SuppressLint("SetTextI18n", "ResourceType")
 class ViewsInteractor @Inject constructor(
     private val repository: Repository,
     private val displayMetricsInteractor: DisplayMetricsInteractor
 ) {
 
     var callBackRemoveHeart: (() -> Unit)? = null
-    var callBackGetCurrentLife: (() -> Unit)? = null
 
     private var widthItem = 200
     private var heightItem = 200
@@ -77,9 +81,9 @@ class ViewsInteractor @Inject constructor(
 
         imageView.setOnClickListener {
             parentView.removeView(imageView)
-            itemSound(activity)
-            repository.updateScore(scorePerItem())
-            updateTextScore(textScore)
+            itemSound(activity, ItemsType.FRUIT)
+            repository.updateScore(scorePerItem())      // TODO: вынести отсюда во viewModel
+            updateTextScore(textScore)      // TODO: вынести отсюда в обсервер во фрагменте
             animatorSet.cancel()
         }
     }
@@ -106,12 +110,9 @@ class ViewsInteractor @Inject constructor(
 
         imageView.setOnClickListener {
             parentView.removeView(imageView)
-            itemSound(activity)
-            repository.updateScore(scorePerItem())
-            updateTextScore(textScore)
+            itemSound(activity, ItemsType.BOMB)
             animatorSet.cancel()
             callBackRemoveHeart?.invoke()
-            callBackGetCurrentLife?.invoke()
         }
     }
 
@@ -145,15 +146,9 @@ class ViewsInteractor @Inject constructor(
             alpha = 1f
         }
 
-//    private fun generateItem() = when ((1..100).random()) {
-//        in 1..80 -> 1
-//        in 81..100 -> 2
-//        else -> 1
-//    }
-
     private fun generateItem() = when ((1..100).random()) {
-        in 1..80 -> 2
-        in 81..100 -> 1
+        in 1..80 -> 1
+        in 81..100 -> 2
         else -> 1
     }
 
@@ -161,8 +156,13 @@ class ViewsInteractor @Inject constructor(
         textScore.text = "Score : ${repository.getScore()}"
     }
 
-    private fun itemSound(context: Context) {
-        val mp: MediaPlayer = MediaPlayer.create(context, R.raw.get_item)
+    private fun itemSound(context: Context, item: ItemsType) {
+        val sound: Int = when (item) {
+            ItemsType.BOMB -> R.raw.get_damage_2
+            ItemsType.FRUIT -> R.raw.get_item
+        }
+
+        val mp: MediaPlayer = MediaPlayer.create(context, sound)
         mp.start()
         mp.setOnCompletionListener(MediaPlayer::release)
     }
@@ -170,7 +170,6 @@ class ViewsInteractor @Inject constructor(
     // TODO: 25.02.2022 сделать класс где будет описана логика прироста очков
     private fun scorePerItem(): Int = 10
 
-    @SuppressLint("ResourceType")
     fun createLifes(activity: Activity, layout: LinearLayout) {
 
         for (i in 1..repository.getCurrentLife()) {
@@ -200,7 +199,6 @@ class ViewsInteractor @Inject constructor(
         LinearLayout.LayoutParams(widthItem, heightItem).apply {
             marginStart = randomMarginStart
         }
-
 
     fun removeHeart(layout: LinearLayout, view: View) {
         layout.removeView(view)
