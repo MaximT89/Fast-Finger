@@ -18,6 +18,7 @@ class Repository @Inject constructor(context: Context) {
     fun updateMaxLife(value: Int) { prefs.maxLife = value }     // TODO: 25.02.2022 сделать платным увеличение максимального числа жизней
 
     fun getCurrentLife() = prefs.currentLife
+    fun getMaxLife() = prefs.maxLife
     fun minusCurrentLife(value: Int) { prefs.currentLife = prefs.currentLife - value }
     fun plusCurrentLife(value: Int) { prefs.currentLife = prefs.currentLife + value }
     fun refreshCurrentLife () { prefs.currentLife = prefs.maxLife }

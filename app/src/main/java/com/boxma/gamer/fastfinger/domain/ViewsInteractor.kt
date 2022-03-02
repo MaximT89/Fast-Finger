@@ -15,13 +15,16 @@ import android.view.animation.LinearInterpolator
 import android.widget.*
 import com.boxma.gamer.fastfinger.R
 import com.boxma.gamer.fastfinger.data.Repository
-import com.boxma.gamer.fastfinger.utils.DisplayMetrics
 import javax.inject.Inject
 
 @SuppressLint("SetTextI18n")
-class ViewsInteractor @Inject constructor(private val repository: Repository) {
+class ViewsInteractor @Inject constructor(
+    private val repository: Repository,
+    private val displayMetricsInteractor: DisplayMetricsInteractor
+) {
 
     var callBackRemoveHeart: (() -> Unit)? = null
+    var callBackGetCurrentLife: (() -> Unit)? = null
 
     private var widthItem = 200
     private var heightItem = 200
@@ -29,12 +32,25 @@ class ViewsInteractor @Inject constructor(private val repository: Repository) {
 
     fun createItem(activity: Activity, parentView: RelativeLayout, textScore: TextView) {
 
-        fun randomMarginStart() = (8..(DisplayMetrics.displayWidth(activity) - widthItem)).random()
-
         when (generateItem()) {
-            1 -> createFruit(activity, parentView, textScore, randomMarginStart())
-//            2 -> createBomb(activity: Activity, parentView: RelativeLayout, textScore: TextView)
-            else -> createFruit(activity, parentView, textScore, randomMarginStart())
+            1 -> createFruit(
+                activity,
+                parentView,
+                textScore,
+                displayMetricsInteractor.randomMarginStart(activity, widthItem)
+            )
+            2 -> createBomb(
+                activity,
+                parentView,
+                textScore,
+                displayMetricsInteractor.randomMarginStart(activity, widthItem)
+            )
+            else -> createFruit(
+                activity,
+                parentView,
+                textScore,
+                displayMetricsInteractor.randomMarginStart(activity, widthItem)
+            )
         }
     }
 
@@ -65,7 +81,37 @@ class ViewsInteractor @Inject constructor(private val repository: Repository) {
             repository.updateScore(scorePerItem())
             updateTextScore(textScore)
             animatorSet.cancel()
+        }
+    }
+
+    private fun createBomb(
+        activity: Activity,
+        parentView: RelativeLayout,
+        textScore: TextView,
+        randomMarginStart: Int
+    ) {
+        val imageView = createImageView(activity, R.drawable.item_bomb, randomMarginStart).also {
+            parentView.addView(it)
+        }
+
+        val animatorSet = createAnimatorSet(activity, heightItem, speedItem, imageView).apply {
+            addListener(object : AnimatorListenerAdapter() {
+
+                override fun onAnimationEnd(animation: Animator?) {
+                    super.onAnimationEnd(animation)
+                    parentView.removeView(imageView)
+                }
+            })
+        }
+
+        imageView.setOnClickListener {
+            parentView.removeView(imageView)
+            itemSound(activity)
+            repository.updateScore(scorePerItem())
+            updateTextScore(textScore)
+            animatorSet.cancel()
             callBackRemoveHeart?.invoke()
+            callBackGetCurrentLife?.invoke()
         }
     }
 
@@ -79,7 +125,7 @@ class ViewsInteractor @Inject constructor(private val repository: Repository) {
             imageView,
             "translationY",
             0f,
-            (DisplayMetrics.displayHeight(activity) - heightItem).toFloat()
+            (displayMetricsInteractor.displayHeight(activity) - heightItem).toFloat()
         ).apply {
             repeatCount = 0
         }
@@ -99,9 +145,15 @@ class ViewsInteractor @Inject constructor(private val repository: Repository) {
             alpha = 1f
         }
 
+//    private fun generateItem() = when ((1..100).random()) {
+//        in 1..80 -> 1
+//        in 81..100 -> 2
+//        else -> 1
+//    }
+
     private fun generateItem() = when ((1..100).random()) {
-        in 1..80 -> 1
-        in 81..100 -> 2
+        in 1..80 -> 2
+        in 81..100 -> 1
         else -> 1
     }
 
@@ -152,7 +204,6 @@ class ViewsInteractor @Inject constructor(private val repository: Repository) {
 
     fun removeHeart(layout: LinearLayout, view: View) {
         layout.removeView(view)
-        repository.minusCurrentLife(1)
     }
 
     fun addHeart(activity: Activity, layout: LinearLayout) {
@@ -172,7 +223,7 @@ class ViewsInteractor @Inject constructor(private val repository: Repository) {
         layout.addView(imageView)
     }
 
-    fun showDialog(activity: Activity){
+    fun showDialog(activity: Activity) {
 
         val dialog = Dialog(activity, R.style.CustomDialog).apply {
             requestWindowFeature(Window.FEATURE_NO_TITLE)

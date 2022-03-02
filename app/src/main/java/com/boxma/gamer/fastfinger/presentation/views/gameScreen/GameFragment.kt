@@ -14,18 +14,21 @@ import com.boxma.gamer.fastfinger.data.Repository
 import com.boxma.gamer.fastfinger.databinding.FragmentGameBinding
 import com.boxma.gamer.fastfinger.domain.LifesInteractor
 import com.boxma.gamer.fastfinger.domain.ViewsInteractor
-import com.boxma.gamer.fastfinger.utils.DisplayMetrics
+import com.boxma.gamer.fastfinger.domain.DisplayMetricsInteractor
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 
 @AndroidEntryPoint
-class GameFragment : BaseFragment<FragmentGameBinding>()  {
+class GameFragment : BaseFragment<FragmentGameBinding>() {
 
     private val viewModel: GameFragmentViewModel by viewModels()
 
-    @Inject lateinit var repository: Repository
-    @Inject lateinit var viewsInteractor: ViewsInteractor
-    @Inject lateinit var lifesInteractor: LifesInteractor
+    @Inject
+    lateinit var repository: Repository
+    @Inject
+    lateinit var viewsInteractor: ViewsInteractor
+    @Inject
+    lateinit var lifesInteractor: LifesInteractor
 
     override fun initBinding(inflater: LayoutInflater, container: ViewGroup?) =
         FragmentGameBinding.inflate(inflater, container, false)
@@ -45,8 +48,12 @@ class GameFragment : BaseFragment<FragmentGameBinding>()  {
             }
 
             itemCount.observe(viewLifecycleOwner) {
-                if(viewModel.isGame.value!!){
-                    viewsInteractor.createItem(requireActivity(), binding.gameField, binding.textScore)
+                if (viewModel.isGame.value!!) {
+                    viewsInteractor.createItem(
+                        requireActivity(),
+                        binding.gameField,
+                        binding.textScore
+                    )
                 }
             }
 
@@ -58,7 +65,16 @@ class GameFragment : BaseFragment<FragmentGameBinding>()  {
 
             isGame.observe(viewLifecycleOwner) {
                 if (it) uiStartGame()
-                else uiFinishGame()
+                else {
+                    viewModel.stopGame()
+                    uiFinishGame()
+                }
+            }
+
+            lifes.observe(viewLifecycleOwner) {
+                if (it == 0) {
+                    isGame.postValue(false)
+                }
             }
         }
     }
@@ -76,10 +92,16 @@ class GameFragment : BaseFragment<FragmentGameBinding>()  {
 
     private fun initUI() {
 
-        Log.d("TAG", "initUI: ${DisplayMetrics.displayWidth(requireActivity())}")
-
         viewsInteractor.updateTextScore(binding.textScore)
-        viewsInteractor.callBackRemoveHeart = { removeHeart() }
+        viewsInteractor.callBackRemoveHeart = {
+
+        // TODO: тут сделать удаление жизни из viewModel и на основе этого удалять view или нет
+            removeHeart()
+        }
+
+        viewsInteractor.callBackGetCurrentLife = {
+            Log.d("TAG", "currentLife in viewModel: ${viewModel.lifes.value}")
+        }
 
         with(binding) {
 
@@ -92,6 +114,8 @@ class GameFragment : BaseFragment<FragmentGameBinding>()  {
                 viewModel.startGame()
                 repository.removeScore()
                 viewsInteractor.updateTextScore(textScore)
+
+                Log.d("TAG", "life in viewModel: ${viewModel.lifes.value}")
             }
 
             btnDeleteHeart.setOnClickListener {
@@ -104,12 +128,13 @@ class GameFragment : BaseFragment<FragmentGameBinding>()  {
         }
     }
 
-    private fun removeHeart(){
+    private fun removeHeart() {
+        Log.d("TAG", "removeHeart: ${repository.getCurrentLife()}")
+
         view?.findViewById<ImageView>(viewsInteractor.getIdHeart())?.let {
             viewsInteractor.removeHeart(binding.fieldLife, it)
+            viewModel.minusLife()
         }
-
     }
-
 
 }

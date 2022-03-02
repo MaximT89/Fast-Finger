@@ -1,29 +1,30 @@
 package com.boxma.gamer.fastfinger.presentation.views.gameScreen
 
 import android.os.CountDownTimer
+import android.util.Log
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.boxma.gamer.fastfinger.data.Repository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
-class GameFragmentViewModel @Inject constructor() : ViewModel() {
+class GameFragmentViewModel @Inject constructor(private val repository: Repository) : ViewModel() {
 
     val TAG = "TAG"
-    private lateinit var gameTimer: CountDownTimer
-    private lateinit var createItemsTimer: CountDownTimer
+    private var gameTimer: CountDownTimer? = null
+    private var createItemsTimer: CountDownTimer? = null
 
     val isGame = MutableLiveData(false)
     val isEndLevel = MutableLiveData(false)
     val currentSecondGame = MutableLiveData(0L)
     val itemCount = MutableLiveData(0L)
-    val lifes = MutableLiveData(3)
-//    var gameTime = 20000L
-    var gameTime = 4000L
-
+    val lifes = MutableLiveData(repository.getMaxLife())
+    var gameTime = 20000L
+//    var gameTime = 4000L
 
     private fun startGameTimer(time: Long) {
         gameTimer = object : CountDownTimer(time, 1000) {
@@ -51,24 +52,31 @@ class GameFragmentViewModel @Inject constructor() : ViewModel() {
     }
 
     fun minusLife() {
-        lifes.postValue(lifes.value?.minus(1))
+        if(repository.getCurrentLife() > 0){
+            lifes.postValue(lifes.value?.minus(1))
+            repository.minusCurrentLife(1)
+        }
     }
 
     fun plusLife() {
-        lifes.postValue(lifes.value?.plus(1))
+        if(repository.getCurrentLife() <= repository.getMaxLife()){
+            lifes.postValue(lifes.value?.plus(1))
+            repository.plusCurrentLife(1)
+        }
     }
 
     fun startGame() {
+        lifes.postValue(repository.getMaxLife())
         isGame.postValue(true)
         isEndLevel.postValue(false)
         startGameTimer(gameTime)
         startItemsTimer(gameTime, speedCreateItems())
     }
 
-    fun stopGame(){
+    fun stopGame() {
         isGame.postValue(false)
-        gameTimer.cancel()
-        createItemsTimer.cancel()
+        gameTimer?.cancel()
+        createItemsTimer?.cancel()
     }
 
     private fun speedCreateItems(): Long {

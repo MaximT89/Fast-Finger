@@ -2,6 +2,7 @@ package com.boxma.gamer.fastfinger.di
 
 import android.content.Context
 import com.boxma.gamer.fastfinger.data.Repository
+import com.boxma.gamer.fastfinger.domain.DisplayMetricsInteractor
 import com.boxma.gamer.fastfinger.domain.LifesInteractor
 import com.boxma.gamer.fastfinger.domain.ViewsInteractor
 import dagger.Module
@@ -21,10 +22,15 @@ class Module {
 
     @Singleton
     @Provides
-    fun provideViewsInteractor(repository: Repository) = ViewsInteractor(repository)
+    fun provideViewsInteractor(repository: Repository, displayMetricsInteractor: DisplayMetricsInteractor) =
+        ViewsInteractor(repository, displayMetricsInteractor)
 
     @Singleton
     @Provides
     fun provideLifesInteractor(repository: Repository) = LifesInteractor(repository)
+
+    @Singleton
+    @Provides
+    fun provideDisplayMetricsInteractor() = DisplayMetricsInteractor()
 
 }
