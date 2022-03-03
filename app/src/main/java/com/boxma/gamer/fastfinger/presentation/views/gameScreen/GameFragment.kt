@@ -68,6 +68,8 @@ class GameFragment : BaseFragment<FragmentGameBinding>() {
 
             lifes.observe(viewLifecycleOwner) {
                 if (it == 0) {
+
+
                     isGame.postValue(false)
                 }
             }
@@ -115,13 +117,13 @@ class GameFragment : BaseFragment<FragmentGameBinding>() {
                 updateTextScore(repository.getScore().toString())
             }
 
-            btnDeleteHeart.setOnClickListener {
-
-                viewsInteractor.showDialog(requireActivity())
-
-                viewModel.stopGame()
-                uiFinishGame()
-            }
+//            btnDeleteHeart.setOnClickListener {
+//
+//                viewsInteractor.showDialog(requireActivity())
+//
+//                viewModel.stopGame()
+//                uiFinishGame()
+//            }
         }
     }
 
