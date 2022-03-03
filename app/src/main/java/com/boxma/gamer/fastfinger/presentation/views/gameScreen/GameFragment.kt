@@ -68,8 +68,6 @@ class GameFragment : BaseFragment<FragmentGameBinding>() {
 
             lifes.observe(viewLifecycleOwner) {
                 if (it == 0) {
-
-
                     isGame.postValue(false)
                 }
             }
