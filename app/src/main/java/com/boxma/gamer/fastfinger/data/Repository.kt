@@ -13,6 +13,7 @@ class Repository @Inject constructor(context: Context) {
 
     fun updateScore(value: Int) { prefs.score = prefs.score + value }
     fun getScore() = prefs.score
+    fun setScore(value: Int) { prefs.score = value }
     fun removeScore() { prefs.score = 0 }
 
     fun updateMaxLife(value: Int) { prefs.maxLife = value }     // TODO: 25.02.2022 сделать платным увеличение максимального числа жизней

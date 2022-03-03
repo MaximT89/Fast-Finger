@@ -23,8 +23,25 @@ class GameFragmentViewModel @Inject constructor(private val repository: Reposito
     val currentSecondGame = MutableLiveData(0L)
     val itemCount = MutableLiveData(0L)
     val lifes = MutableLiveData(repository.getMaxLife())
-    var gameTime = 20000L
-//    var gameTime = 4000L
+    var score = MutableLiveData(0)
+
+//    var gameTime = 20000L
+    var gameTime = 8000L
+
+    fun updateScore(value : Int){
+        score.postValue(score.value!! + value)
+        repository.setScore(score.value!!)
+    }
+
+    private fun refreshScore() {
+        score.postValue(0)
+        repository.setScore(score.value!!)
+    }
+
+    private fun refreshLifes(){
+        repository.refreshCurrentLife()
+        lifes.postValue(repository.getCurrentLife())
+    }
 
     private fun startGameTimer(time: Long) {
         gameTimer = object : CountDownTimer(time, 1000) {
@@ -53,20 +70,21 @@ class GameFragmentViewModel @Inject constructor(private val repository: Reposito
 
     fun minusLife() {
         if(repository.getCurrentLife() > 0){
-            lifes.postValue(lifes.value?.minus(1))
             repository.minusCurrentLife(1)
+            lifes.postValue(repository.getCurrentLife())
         }
     }
 
     fun plusLife() {
         if(repository.getCurrentLife() <= repository.getMaxLife()){
-            lifes.postValue(lifes.value?.plus(1))
             repository.plusCurrentLife(1)
+            lifes.postValue(repository.getCurrentLife())
         }
     }
 
     fun startGame() {
-        lifes.postValue(repository.getMaxLife())
+        refreshScore()
+        refreshLifes()
         isGame.postValue(true)
         isEndLevel.postValue(false)
         startGameTimer(gameTime)

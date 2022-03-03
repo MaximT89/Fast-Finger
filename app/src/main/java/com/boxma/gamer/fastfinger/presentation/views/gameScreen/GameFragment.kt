@@ -1,5 +1,6 @@
 package com.boxma.gamer.fastfinger.presentation.views.gameScreen
 
+import android.annotation.SuppressLint
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
@@ -12,23 +13,18 @@ import androidx.fragment.app.viewModels
 import com.boxma.gamer.fastfinger.core.BaseFragment
 import com.boxma.gamer.fastfinger.data.Repository
 import com.boxma.gamer.fastfinger.databinding.FragmentGameBinding
-import com.boxma.gamer.fastfinger.domain.LifesInteractor
 import com.boxma.gamer.fastfinger.domain.ViewsInteractor
-import com.boxma.gamer.fastfinger.domain.DisplayMetricsInteractor
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 
 @AndroidEntryPoint
+@SuppressLint("SetTextI18n")
 class GameFragment : BaseFragment<FragmentGameBinding>() {
 
     private val viewModel: GameFragmentViewModel by viewModels()
 
-    @Inject
-    lateinit var repository: Repository
-    @Inject
-    lateinit var viewsInteractor: ViewsInteractor
-    @Inject
-    lateinit var lifesInteractor: LifesInteractor
+    @Inject lateinit var repository: Repository
+    @Inject lateinit var viewsInteractor: ViewsInteractor
 
     override fun initBinding(inflater: LayoutInflater, container: ViewGroup?) =
         FragmentGameBinding.inflate(inflater, container, false)
@@ -51,8 +47,7 @@ class GameFragment : BaseFragment<FragmentGameBinding>() {
                 if (viewModel.isGame.value!!) {
                     viewsInteractor.createItem(
                         requireActivity(),
-                        binding.gameField,
-                        binding.textScore
+                        binding.gameField
                     )
                 }
             }
@@ -76,7 +71,15 @@ class GameFragment : BaseFragment<FragmentGameBinding>() {
                     isGame.postValue(false)
                 }
             }
+
+            score.observe(viewLifecycleOwner) {
+                updateTextScore(it.toString())
+            }
         }
+    }
+
+    private fun updateTextScore(score: String) {
+        binding.textScore.text = "Score : $score"
     }
 
     private fun uiFinishGame() {
@@ -92,30 +95,24 @@ class GameFragment : BaseFragment<FragmentGameBinding>() {
 
     private fun initUI() {
 
-        viewsInteractor.updateTextScore(binding.textScore)
+        updateTextScore(repository.getScore().toString())
         viewsInteractor.callBackRemoveHeart = {
-
-        // TODO: тут сделать удаление жизни из viewModel и на основе этого удалять view или нет
             removeHeart()
+            viewModel.minusLife()
         }
 
-        viewsInteractor.callBackGetCurrentLife = {
-            Log.d("TAG", "currentLife in viewModel: ${viewModel.lifes.value}")
-        }
+        viewsInteractor.callBackUpdateScore = { viewModel.updateScore(viewsInteractor.scorePerItem()) }
 
         with(binding) {
 
             startGame.setOnClickListener {
+                viewModel.startGame()
 
-                lifesInteractor.refreshCurrentLife()
                 viewsInteractor.removeAllHeart(fieldLife)
                 viewsInteractor.createLifes(requireActivity(), fieldLife)
 
-                viewModel.startGame()
                 repository.removeScore()
-                viewsInteractor.updateTextScore(textScore)
-
-                Log.d("TAG", "life in viewModel: ${viewModel.lifes.value}")
+                updateTextScore(repository.getScore().toString())
             }
 
             btnDeleteHeart.setOnClickListener {
@@ -133,8 +130,6 @@ class GameFragment : BaseFragment<FragmentGameBinding>() {
 
         view?.findViewById<ImageView>(viewsInteractor.getIdHeart())?.let {
             viewsInteractor.removeHeart(binding.fieldLife, it)
-            viewModel.minusLife()
         }
     }
-
 }

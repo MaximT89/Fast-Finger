@@ -15,6 +15,7 @@ import android.view.animation.LinearInterpolator
 import android.widget.*
 import com.boxma.gamer.fastfinger.R
 import com.boxma.gamer.fastfinger.data.Repository
+import com.boxma.gamer.fastfinger.domain.ItemsType.*
 import javax.inject.Inject
 
 enum class ItemsType {
@@ -29,30 +30,28 @@ class ViewsInteractor @Inject constructor(
 ) {
 
     var callBackRemoveHeart: (() -> Unit)? = null
+    var callBackUpdateScore: (() -> Unit)? = null
 
     private var widthItem = 200
     private var heightItem = 200
     private var speedItem = 4000L
 
-    fun createItem(activity: Activity, parentView: RelativeLayout, textScore: TextView) {
+    fun createItem(activity: Activity, parentView: RelativeLayout) {
 
         when (generateItem()) {
-            1 -> createFruit(
+            FRUIT -> createFruit(
                 activity,
                 parentView,
-                textScore,
                 displayMetricsInteractor.randomMarginStart(activity, widthItem)
             )
-            2 -> createBomb(
+            BOMB -> createBomb(
                 activity,
                 parentView,
-                textScore,
                 displayMetricsInteractor.randomMarginStart(activity, widthItem)
             )
             else -> createFruit(
                 activity,
                 parentView,
-                textScore,
                 displayMetricsInteractor.randomMarginStart(activity, widthItem)
             )
         }
@@ -61,7 +60,6 @@ class ViewsInteractor @Inject constructor(
     private fun createFruit(
         activity: Activity,
         parentView: RelativeLayout,
-        textScore: TextView,
         randomMarginStart: Int,
     ) {
 
@@ -81,9 +79,8 @@ class ViewsInteractor @Inject constructor(
 
         imageView.setOnClickListener {
             parentView.removeView(imageView)
-            itemSound(activity, ItemsType.FRUIT)
-            repository.updateScore(scorePerItem())      // TODO: вынести отсюда во viewModel
-            updateTextScore(textScore)      // TODO: вынести отсюда в обсервер во фрагменте
+            itemSound(activity, FRUIT)
+            callBackUpdateScore?.invoke()
             animatorSet.cancel()
         }
     }
@@ -91,7 +88,6 @@ class ViewsInteractor @Inject constructor(
     private fun createBomb(
         activity: Activity,
         parentView: RelativeLayout,
-        textScore: TextView,
         randomMarginStart: Int
     ) {
         val imageView = createImageView(activity, R.drawable.item_bomb, randomMarginStart).also {
@@ -110,7 +106,7 @@ class ViewsInteractor @Inject constructor(
 
         imageView.setOnClickListener {
             parentView.removeView(imageView)
-            itemSound(activity, ItemsType.BOMB)
+            itemSound(activity, BOMB)
             animatorSet.cancel()
             callBackRemoveHeart?.invoke()
         }
@@ -146,20 +142,23 @@ class ViewsInteractor @Inject constructor(
             alpha = 1f
         }
 
+//    private fun generateItem() = when ((1..100).random()) {
+//        in 1..80 -> FRUIT
+//        in 81..100 -> BOMB
+//        else -> 1
+//    }
+
     private fun generateItem() = when ((1..100).random()) {
-        in 1..80 -> 1
-        in 81..100 -> 2
+        in 1..80 -> BOMB
+        in 81..100 -> FRUIT
         else -> 1
     }
 
-    fun updateTextScore(textScore: TextView) {
-        textScore.text = "Score : ${repository.getScore()}"
-    }
-
     private fun itemSound(context: Context, item: ItemsType) {
+
         val sound: Int = when (item) {
-            ItemsType.BOMB -> R.raw.get_damage_2
-            ItemsType.FRUIT -> R.raw.get_item
+            BOMB -> R.raw.get_damage_2
+            FRUIT -> R.raw.get_item
         }
 
         val mp: MediaPlayer = MediaPlayer.create(context, sound)
@@ -168,7 +167,7 @@ class ViewsInteractor @Inject constructor(
     }
 
     // TODO: 25.02.2022 сделать класс где будет описана логика прироста очков
-    private fun scorePerItem(): Int = 10
+    fun scorePerItem(): Int = 10
 
     fun createLifes(activity: Activity, layout: LinearLayout) {
 
@@ -179,6 +178,7 @@ class ViewsInteractor @Inject constructor(
             )
 
             val imageView = ImageView(activity).apply {
+                setPadding(0, 5, 0,5)
                 setImageResource(R.drawable.heart_2)
                 layoutParams = params
                 id = 100 + i

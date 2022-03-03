@@ -21,49 +21,55 @@
         android:layout_height="wrap_content"
         android:textAppearance="@style/CustomTextViewWhite"
         android:textSize="20dp"
+        android:paddingVertical="5dp"
         android:paddingHorizontal="10dp"
         tools:text="Score : 20"
-        android:layout_marginTop="25dp"
+        android:layout_marginTop="@dimen/margin_top_fields"
         android:translationZ="100dp"/>
 
     <LinearLayout
         android:id="@+id/field_life"
         android:layout_width="180dp"
-        android:layout_height="30dp"
+        android:layout_height="40dp"
         android:layout_marginRight="5dp"
         android:translationZ="100dp"
         android:layout_gravity="right"
         android:gravity="right"
-        android:layout_marginTop="25dp"
+        android:layout_marginTop="@dimen/margin_top_fields"
         android:orientation="horizontal">
 
         <ImageView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:paddingVertical="5dp"
             android:visibility="gone"
             tools:visibility="visible"
             android:src="@drawable/heart_2"/>
         <ImageView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:paddingVertical="5dp"
             android:visibility="gone"
             tools:visibility="visible"
             android:src="@drawable/heart_2"/>
         <ImageView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:paddingVertical="5dp"
             android:visibility="gone"
             tools:visibility="visible"
             android:src="@drawable/heart_2"/>
         <ImageView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:paddingVertical="5dp"
             android:visibility="gone"
             tools:visibility="visible"
             android:src="@drawable/heart_2"/>
         <ImageView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:paddingVertical="5dp"
             android:visibility="gone"
             tools:visibility="visible"
             android:src="@drawable/heart_2"/>
@@ -74,22 +80,16 @@
     <RelativeLayout
         android:id="@+id/wrap_field"
         android:background="@drawable/wrap_style"
-        android:layout_marginTop="20dp"
+        android:layout_marginTop="@dimen/margin_top_fields"
         android:alpha="0.5"
         android:layout_width="match_parent"
-        android:layout_height="match_parent" >
-
-
-
-    </RelativeLayout>
+        android:layout_height="match_parent"/>
 
     <RelativeLayout
         android:id="@+id/game_field"
-        android:layout_marginTop="20dp"
+        android:layout_marginTop="@dimen/margin_top_fields"
         android:layout_width="match_parent"
-        android:layout_height="match_parent" >
-
-    </RelativeLayout>
+        android:layout_height="match_parent"/>
 
     <TextView
         android:id="@+id/text_timer"
@@ -97,8 +97,9 @@
         android:gravity="center_horizontal"
         android:layout_height="wrap_content"
         android:layout_gravity="center_horizontal"
-        android:layout_marginTop="25dp"
+        android:layout_marginTop="@dimen/margin_top_fields"
         android:paddingHorizontal="10dp"
+        android:paddingVertical="5dp"
         android:textSize="20dp"
         android:textAppearance="@style/CustomTextViewWhite"
         tools:text="20" />
